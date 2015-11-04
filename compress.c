@@ -568,7 +568,19 @@ int compress_set_gapless_metadata(struct compress *compress,
 	metadata.value[0] = mdata->encoder_delay;
 	if (ioctl(compress->fd, SNDRV_COMPRESS_SET_METADATA, &metadata))
 		return oops(compress, errno, "can't set metadata for stream\n");
+
 	compress->gapless_metadata = 1;
+	return 0;
+}
+
+int compress_set_next_track_param(struct compress *compress,
+	union snd_codec_options *codec_options)
+{
+	if (!is_compress_running(compress))
+		return oops(compress, ENODEV, "device not ready");
+
+	if (ioctl(compress->fd, SNDRV_COMPRESS_SET_NEXT_TRACK_PARAM, codec_options))
+		return oops(compress, errno, "cannot set next track params\n");
 	return 0;
 }
 
